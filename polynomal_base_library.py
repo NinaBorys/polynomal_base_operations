@@ -3,13 +3,14 @@
 
 class Polynom(object):
 
-    def __init__(self, m, pol=None):
-        mod = (m + 1) * [0]
-        mod[0] = 1
-        mod[m] = 1
-        mod[182] = 1
-        self.m = m
-        self.module = mod
+    def __init__(self, m=None, pol=None):
+        if m:
+            mod = (m + 1) * [0]
+            mod[0] = 1
+            mod[m] = 1
+            mod[182] = 1
+            self.m = m
+            self.module = Polynom(pol=mod)
         self.array = pol and [int(x) for x in pol] or list()
 
     def const_zero(self):
@@ -25,33 +26,28 @@ class Polynom(object):
     def to_array(self, a_str):
         return [int(z) for z in a_str]
 
-    def to_string(self, a_arr):
-        k = ''.join([str(e) for e in a_arrr])
-        return k
-
     def High_bit(self, a):
         for i, e in enumerate(a):
             if e == 1:
                 return len(a[i:])
         return 0
 
-    def bit_and(self, a):
-        temp = int(''.join([str(e) for e in a]), 2)
-        return temp & 1
+    # def bit_and(self, a):
+    #     temp = int(''.join([str(e) for e in a]), 2)
+    #     return temp & 1
 
-    def shift_left(self, a, k):
-        temp = bin(int(''.join([str(e) for e in a]), 2) << k)[2:]
-        return list([int(c) for c in temp])
+    # def shift_left(self, a, k):
+    #     temp = bin(int(''.join([str(e) for e in a]), 2) << k)[2:]
+    #     return list([int(c) for c in temp])
 
-    def shift_right(self, a, k):
-        len1 = len(a)
-        temp = bin(int(''.join([str(e) for e in a]), 2) >> k)[2:]
-        len2 = len(temp)
-        res = list([int(c) for c in temp])
-
-        for i in range(0, len1 - len2, 1):
-            res.insert(0, 0)
-        return res
+    # def shift_right(self, a, k):
+    #     len1 = len(a)
+    #     temp = bin(int(''.join([str(e) for e in a]), 2) >> k)[2:]
+    #     len2 = len(temp)
+    #     res = list([int(c) for c in temp])
+    #     for i in range(0, len1 - len2, 1):
+    #         res.insert(0, 0)
+    #     return res
 
     def __and__(self, value):
         return int(self) & 1
@@ -70,6 +66,9 @@ class Polynom(object):
     def insert(self, index, value):
         self.array.insert(index, value)
 
+    def append(self, value):
+        self.array.append(value)
+
     def __int__(self):
         return int(''.join(map(str, self)), 2)
 
@@ -85,8 +84,15 @@ class Polynom(object):
     def __getitem__(self, index):
         return self.array[index]
 
+    def __setitem__(self, index, value):
+        self.array[index] = value
+
     def __iter__(self):
         for x in self.array:
+            yield x
+
+    def __reversed__(self):
+        for x in reversed(self.array):
             yield x
 
     def __add__(self, other):
@@ -105,62 +111,58 @@ class Polynom(object):
             add_result.insert(i, x)
         return add_result
 
-    def reduction(self, a):
+    def contains_single(self, element):
+        if len(self) == 1 and element in self:
+            return True
+        return False
+
+    def reduction(self):
         def first_is_bigger(first, second):
-            a = int(''.join(map(str, first)), 2)
-            b = int(''.join(map(str, second)), 2)
-            return a > b and True or False
+            return int(first) > int(second) and True or False
 
         r = Polynom(self.m, '0')
         q = Polynom(self.m, '0')
 
         t = self.High_bit(self.module)
-
-        if self.module == [1]:
+        if self.module.contains_single(1):
             return r
-
-        while (self.first_is_bigger(a, self.module)):
+        while (first_is_bigger(self, self.module)):
 
             k = self.High_bit(a)
             c = self.module
-            c = self.shift_left(c, k - t)
+            c = c << k - t
 
-            while (self.first_is_bigger(c, a) and (k - 1 - t) >= 0):
+            while (first_is_bigger(c, self) and (k - 1 - t) >= 0):
                 k -= 1
-                c = self.shift_right(c, 1)
+                c = c >> 1
 
-            temp = [1]
-            temp = self.shift_left(temp, (k - t))
-            q = self.addition(q, temp)
-            a = self.addition(a, c)
-        r = a
-        for i in range(0, len(r)):
-            if r[i] != 0:
-                r = r[i:]
-                break
+            temp = Polynom(self.m, '1')
+            temp = temp << k - t
+            q = q + temp
+            self = self + c
+        r = self
+        for i, e in enumerate(r):
+            if e:
+                return Polynom(self.m, r[i:])
         return r
 
-    def mul_on_number(self, arr, n):
-        result = []
-        for i in range(0, len(arr), 1):
-            result.insert(i, arr[i] & n)
+    def mul_on_number(self, n):
+        result = Polynom(self.m)
+        for e in self:
+            result.append(e & n)
         return result
 
-    def multiplication(self, a, b):
-        mul_result = [0]
-        temp = []
+    def __mul__(self, other):
+        mul_result = Polynom(self.m, '0')
+        temp = Polynom(self.m)
 
-        for i in range(len(b) - 1, -1, -1):
-            temp.append(self.mul_on_number(a, b[i]))
+        for e in reversed(other):
+            temp.append(self.mul_on_number(e))
 
-        for i in range(0, len(temp), 1):
-            temp[i] = self.shift_left(temp[i], i)
-
-        for i in range(0, len(temp)):
-            mul_result = self.addition(mul_result, temp[i])
-
-        mul_result = self.reduction(mul_result, self.modul)
-        return mul_result
+        for i, e in enumerate(temp):
+            mul_result = mul_result + e << i
+        print(type(mul_result))
+        return mul_result.reduction()
 
     def square(self, a):
         result = []

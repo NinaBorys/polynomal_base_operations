@@ -9,7 +9,7 @@ def main():
     m = 191
     x = Polynom(m, s1)
     y = Polynom(m, s2)
-    z = x + y
+    z = x * y
     print(z)
 
 
