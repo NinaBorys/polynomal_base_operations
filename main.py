@@ -5,11 +5,11 @@ from polynomal_base_library import Polynom
 
 def main():
     s1 = '1011100110111111'
-    s2 = '1001011001001101'
+    s2 = '100100110101011001'
     m = 191
     x = Polynom(m, s1)
     y = Polynom(m, s2)
-    z = x * y
+    z = x + y
     print(z)
 
 
