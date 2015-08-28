@@ -1,12 +1,16 @@
-#! /usr/bin/python3.3
+#! /usr/bin/python3
 
 
 class Polynom(object):
 
-    def __init__(self, modul, m):
-        self.modul = modul
+    def __init__(self, m, pol=None):
+        mod = (m + 1) * [0]
+        mod[0] = 1
+        mod[m] = 1
+        mod[182] = 1
         self.m = m
-        pass
+        self.module = mod
+        self.array = pol and [int(x) for x in pol] or list()
 
     def const_zero(self):
         m = self.m
@@ -54,43 +58,53 @@ class Polynom(object):
     def first_is_bigger(self, first, second):
         a = int(''.join([str(e) for e in first]), 2)
         b = int(''.join([str(e) for e in second]), 2)
+        return a > b and True or False
 
-        if a > b:
-            return True
-        else:
-            return False
+    def insert(self, index, value):
+        self.array.insert(index, value)
 
-    def addition(self, first, second):
-        add_result = []
+    def __str__(self):
+        return ''.join(map(str, self.array))
 
-        if len(first) > len(second):
-            for i in range(0, len(first) - len(second), 1):
-                second.insert(0, 0)
+    def __len__(self):
+        return len(self.array)
 
-        if len(second) > len(first):
-            for i in range(0, len(second) - len(first), 1):
-                first.insert(0, 0)
+    def __getitem__(self, index):
+        return self.array[index]
 
-        for i in range(0, len(first), 1):
-            if(first[i] == second[i]):
-                add_result.insert(i, 0)
-            else:
-                add_result.insert(i, 1)
+    def __iter__(self):
+        for x in self.array:
+            yield x
+
+    def __add__(self, other):
+        add_result = Polynom(self.m)
+
+        if len(self) > len(other):
+            for i in range(len(self) - len(other)):
+                other.insert(0, 0)
+
+        if len(other) > len(self):
+            for i in range(len(other) - len(self)):
+                self.insert(0, 0)
+
+        for i, e in enumerate(zip(self, other)):
+            x = e != other[i] and 1 or 0
+            add_result.insert(i, x)
         return add_result
 
-    def reduction(self, a, mod):
+    def reduction(self, a):
         r = [0]
         q = [0]
 
-        t = self.High_bit(mod)
+        t = self.High_bit(self.module)
 
-        if mod == [1]:
-        	return r
+        if self.module == [1]:
+            return r
 
-        while (self.first_is_bigger(a, mod)):
+        while (self.first_is_bigger(a, self.module)):
 
             k = self.High_bit(a)
-            c = mod
+            c = self.module
             c = self.shift_left(c, k - t)
 
             while (self.first_is_bigger(c, a) and (k - 1 - t) >= 0):
