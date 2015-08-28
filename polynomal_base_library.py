@@ -30,12 +30,10 @@ class Polynom(object):
         return k
 
     def High_bit(self, a):
-        res = 0
-        for i in range(0, len(a), 1):
-            if a[i] == 1:
-                res = len(a[i:])
-                break
-        return res
+        for i, e in enumerate(a):
+            if e == 1:
+                return len(a[i:])
+        return 0
 
     def bit_and(self, a):
         temp = int(''.join([str(e) for e in a]), 2)
@@ -55,16 +53,31 @@ class Polynom(object):
             res.insert(0, 0)
         return res
 
-    def first_is_bigger(self, first, second):
-        a = int(''.join([str(e) for e in first]), 2)
-        b = int(''.join([str(e) for e in second]), 2)
-        return a > b and True or False
+    def __and__(self, value):
+        return int(self) & 1
+
+    def __lshift__(self, value):
+        temp = bin(int(self) << value)[2:]
+        return Polynom(self.m, temp)
+
+    def __rshift__(self, value):
+        temp = bin(int(self) >> value)[2:]
+        temp = Polynom(self.m, temp)
+        for e in range(len(self) - len(temp)):
+            temp.insert(0, 0)
+        return temp
 
     def insert(self, index, value):
         self.array.insert(index, value)
 
+    def __int__(self):
+        return int(''.join(map(str, self)), 2)
+
     def __str__(self):
-        return ''.join(map(str, self.array))
+        for i, e in enumerate(self):
+            if e:
+                return ''.join(map(str, self.array[i:]))
+        return '0'
 
     def __len__(self):
         return len(self.array)
@@ -87,14 +100,19 @@ class Polynom(object):
             for i in range(len(other) - len(self)):
                 self.insert(0, 0)
 
-        for i, e in enumerate(zip(self, other)):
+        for i, e in enumerate(self):
             x = e != other[i] and 1 or 0
             add_result.insert(i, x)
         return add_result
 
     def reduction(self, a):
-        r = [0]
-        q = [0]
+        def first_is_bigger(first, second):
+            a = int(''.join(map(str, first)), 2)
+            b = int(''.join(map(str, second)), 2)
+            return a > b and True or False
+
+        r = Polynom(self.m, '0')
+        q = Polynom(self.m, '0')
 
         t = self.High_bit(self.module)
 
