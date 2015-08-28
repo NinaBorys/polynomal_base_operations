@@ -166,7 +166,7 @@ class Polynom(object):
                 n = n >> 1
         return result
 
-    def inverse_element(self):
+    def __invert__(self):
         result = self
         temp = self
 

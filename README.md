@@ -7,7 +7,7 @@ Added:
 - '\_\_mul\_\_'
 - 'sqare'
 - '\_\_pow\_\_'
-- 'inverse_element'
+- '\_\_invert\_\_'
 - 'Trace'
 
 Example:
