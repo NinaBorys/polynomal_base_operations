@@ -3,10 +3,10 @@ Polynomial base operations
 Small library for perfoming arithmetic operations with polynoms
 
 Added:
-- '__add__'
-- '__mul__'
+- '\_\_add\_\_'
+- '\_\_mul\_\_'
 - 'sqare'
-- '__pow__'
+- '\_\_pow\_\_'
 - 'inverse_element'
 - 'Trace'
 
